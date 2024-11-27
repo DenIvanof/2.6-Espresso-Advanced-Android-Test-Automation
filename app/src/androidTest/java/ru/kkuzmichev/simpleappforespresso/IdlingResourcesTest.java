@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -25,6 +26,8 @@ import androidx.test.filters.LargeTest;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +42,16 @@ public class IdlingResourcesTest {
     public ActivityScenarioRule<MainActivity> mActivityScenarioRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
+    @Before // Выполняется перед тестами
+    public void registerIdlingResources() { //Подключаемся к “счетчику”
+        IdlingRegistry.getInstance().register(EspressoIdlingResources.idlingResource);
+    }
+
+    @After // Выполняется после тестов
+    public void unregisterIdlingResources() { //Отключаемся от “счетчика”
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResources.idlingResource);
+    }
+
     @Test
     public void idlingResourcesTest() throws InterruptedException {
         ViewInteraction appCompatImageButton = onView(withContentDescription("Open navigation drawer"));
@@ -48,7 +61,7 @@ public class IdlingResourcesTest {
         ViewInteraction navigationMenuItemView = onView(withId(R.id.nav_gallery));
         navigationMenuItemView.check(matches(isDisplayed()));
         navigationMenuItemView.perform(click());
-        Thread.sleep(1000);
+        //Thread.sleep(1000);
 
         ViewInteraction textView = onView(withText("7"));
         textView.check(matches(isDisplayed()));
